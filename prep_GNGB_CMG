@@ -1,0 +1,103 @@
+
+# Extracting IA Task Ratings
+
+import csv,sys
+
+
+def toList(file1):
+        data = []
+        with open(file1, 'rU') as fin:
+                reader = csv.reader(fin)
+                for row in reader:
+                        data.append(row[0:])
+        return data
+
+
+filename = sys.argv[1] # Behavioral File
+outputFile = sys.argv[2] # outputFile
+
+out = open(outputFile,'w')
+
+
+rawfile = toList(filename)
+#get rid of header lines
+rawfile = rawfile[2:]
+
+print rawfile
+
+#next trial number for each type, will write out long format file with names like:
+#[go|nogo]_[win|lose]_[trial] [NA|rt]
+#for example
+#go_win_0 0.4
+
+go_win_idx = 0
+go_lose_idx = 0
+nogo_win_idx = 0
+nogo_lose_idx = 0
+
+for row in rawfile:
+	trial_number = row[0]
+	trial_type = row[1]
+
+	# Final Rating is eventcode 7
+	event_code = row[2]
+
+	absolute_time = row[3]
+	response_time = row[4]
+	response = row[5]
+	result = row[6]
+
+        if response == "don't know":
+                response = 'DontKnow'
+ 
+
+	#8 is trial end
+	if event_code == '8':
+		#print trial_number,trial_type
+		if trial_type == '0':
+			out.write('gngb_go_win_' + str(go_win_idx) + ' ' + response_time + '\n')
+			go_win_idx = go_win_idx + 1
+		if trial_type == '1':
+			out.write('gngb_go_lose_' + str(go_lose_idx) + ' ' + response_time + '\n')
+			go_lose_idx = go_lose_idx + 1
+		if trial_type == '2':
+			out.write('gngb_nogo_win_' + str(nogo_win_idx) + ' ' + response_time + '\n')
+			nogo_win_idx = nogo_win_idx + 1
+		if trial_type == '3':
+			out.write('gngb_nogo_lose_' + str(nogo_lose_idx) + ' ' + response_time + '\n')
+			nogo_lose_idx = nogo_lose_idx + 1
+	#final reward the participant received
+	if event_code == '12':
+		out.write('gngb_total_reward ' + result + '\n')
+		
+	#subjective responses to each image
+	if event_code == '14':
+		if trial_type == '0':
+			out.write('gngb_go_win_outcomes ' + response + '\n')
+		if trial_type == '1':
+			out.write('gngb_go_lose_outcomes ' + response + '\n')
+		if trial_type == '2':
+			out.write('gngb_nogo_win_outcomes ' + response + '\n')
+		if trial_type == '3':
+			out.write('gngb_nogo_lose_outcomes ' + response + '\n')
+
+	if event_code == '16':
+		if trial_type == '0':
+			out.write('gngb_go_win_strategy ' + response + '\n')
+		if trial_type == '1':
+			out.write('gngb_go_lose_strategy ' + response + '\n')
+		if trial_type == '2':
+			out.write('gngb_nogo_win_strategy ' + response + '\n')
+		if trial_type == '3':
+			out.write('gngb_nogo_lose_strategy ' + response + '\n')
+		
+
+out.close()
+
+
+
+
+
+
+
+	
