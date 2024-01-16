@@ -118,9 +118,7 @@ pC      = spm_cat(pC);
 M.L     = @(P,M,U,Y)spm_mdp_L(P,M,U,Y);  % log-likelihood function
 M.pE    = pE;                            % prior means (parameters)
 M.pC    = pC;                            % prior variance (parameters)
-%M.mdp   = DCM.MDP;                       % MDP structure
-% M.TpB = DCM.TpB;
-% M.NB = DCM.NB;
+
 % Variational Laplace
 %--------------------------------------------------------------------------
 [Ep,Cp,F] = spm_nlsi_Newton(M,DCM.U,DCM.Y);

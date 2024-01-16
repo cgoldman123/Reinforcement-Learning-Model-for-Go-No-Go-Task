@@ -67,27 +67,15 @@ DCM        = GNG_inversion_RL(DCM);   % Invert the model
 %--------------------------------------------------------------------------
 field = fieldnames(DCM.M.pE);
 for i = 1:length(field)
-    if strcmp(field{i},'alpha_win')
-        prior(i) = 1/(1+exp(-DCM.M.pE.(field{i})));
-        posterior(i) = 1/(1+exp(-DCM.Ep.(field{i})));
-    elseif strcmp(field{i},'alpha_loss')
-        prior(i) = 1/(1+exp(-DCM.M.pE.(field{i})));
-        posterior(i) = 1/(1+exp(-DCM.Ep.(field{i})));
-    elseif strcmp(field{i},'zeta')
-        prior(i) = 1/(1+exp(-DCM.M.pE.(field{i})));
-        posterior(i) = 1/(1+exp(-DCM.Ep.(field{i})));       
-    elseif strcmp(field{i},'V0')
-        prior(i) = 1/(1+exp(-DCM.M.pE.(field{i})));
-        posterior(i) = 1/(1+exp(-DCM.Ep.(field{i}))); 
-    elseif strcmp(field{i},'beta')
-        prior(i) = exp(DCM.M.pE.(field{i}));
-        posterior(i) = exp(DCM.Ep.(field{i})); 
-    elseif strcmp(field{i},'prior_a')
-        prior(i) = DCM.M.pE.(field{i});
-        posterior(i) = DCM.Ep.(field{i}); 
+    if strcmp(field{i},'alpha_win') || strcmp(field{i},'alpha_loss') || strcmp(field{i},'zeta')
+        prior.(field{i}) = 1/(1+exp(-DCM.M.pE.(field{i})));
+        posterior.(field{i}) = 1/(1+exp(-DCM.Ep.(field{i})));  
+    elseif (strcmp(field{i},'beta') || strcmp(field{i},'rs') || ...
+        strcmp(field{i},'la') || strcmp(field{i},'pi_win') || strcmp(field{i},'pi_loss'))
+        prior.(field{i}) = exp(DCM.M.pE.(field{i}));
+        posterior.(field{i}) = exp(DCM.Ep.(field{i})); 
     else
-        prior(i) = exp(DCM.M.pE.(field{i}));
-        posterior(i) = exp(DCM.Ep.(field{i}));
+        fprintf("Warning: Was not expecting this prior/posterior field name. See GNG_fit");
     end
 end
 
@@ -103,10 +91,9 @@ for trial = 1:160
     task_rewards(choices(trial),trial, U_block(trial,2)) = U_block(trial,1);
 end
 
-    
-params = struct('prior_a', posterior(1), 'alpha_win', posterior(2), 'alpha_loss', posterior(3), 'rs',posterior(4), 'la',posterior(4),... 
-                'pi_loss', posterior(5), 'pi_win', posterior(6), 'zeta', posterior(7), 'beta', posterior(8));
-MDP = RW_model_extended_GNG(params, task_rewards, states_block, choices);
+% note there appears to be an error here with leaving prior_a as a variable in the model
+
+MDP = RW_model_extended_GNG(posterior, task_rewards, states_block, choices);
 MDP.observations = outcomes(:,2);
 if PLOT
     GNG_plot(MDP, states_block);
@@ -126,7 +113,12 @@ acc_avg = sum(acc)/length(acc);
 fprintf('Avg action prob: %f\n', p_avg);
 fprintf('Model accuracy: %f\n', acc_avg);
 
-fit_results = [{file} prior posterior MDP acc_avg p_avg];
+fit_results.prior = prior;
+fit_results.posterior = posterior;
+fit_results.MDP = MDP;
+fit_results.model_acc = acc_avg;
+fit_results.avg_action_prob = p_avg;
+fit_results.filepath = file;
 
 clear MDP;
 

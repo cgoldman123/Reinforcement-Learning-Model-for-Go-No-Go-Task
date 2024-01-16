@@ -1,10 +1,10 @@
-% Gets all data in
-% 'L:\NPC\DataSink\COBRE-CORE\data-original\behavioral_session\' 
-% and puts CSVs in destinationDir
+% Carter Goldman and Claire Lavalley, 2023
+% Gets all data in sourceDir (organized by date of behavioral session) and puts CSVs in destinationDir
+% based on matching the filePattern
 
 % Define source and destination directories
 sourceDir = 'L:\NPC\DataSink\COBRE-CORE\data-original\behavioral_session\';
-destinationDir = 'L:\rsmith\lab-members\cgoldman\go_no_go\COBRE_GNGB_data';
+destinationDir = 'L:\rsmith\l\cgoldman\go_no_go\COBRE_GNGB_data';
 
 % Define the pattern to search for in file names
 filePattern = 'GNGB.*R1-_BEH\.csv';

@@ -1,4 +1,4 @@
-% Samuel Taylor and Ryan Smith, 2021
+% Carter Goldman, 2023
 
 % Plots the action probabilities, observations, and responses for the TAB 
 % task

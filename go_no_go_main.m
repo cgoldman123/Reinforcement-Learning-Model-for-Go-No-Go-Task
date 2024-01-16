@@ -67,24 +67,15 @@ else
         
         fit_results = GNG_fit(subject, input_dir, field, priors, PLOT);
         results.subject = subject;
-        results.baseline_alpha_loss = fit_results{1,2}(1);
-        results.baseline_alpha_win = fit_results{1,2}(2);
-        results.baseline_rs = fit_results{1,2}(3);
-        results.baseline_la = fit_results{1,2}(4);
-        results.baseline_pi_loss = fit_results{1,2}(5);
-        results.baseline_pi_win = fit_results{1,2}(6);
-        results.baseline_zeta = fit_results{1,2}(7);
-        results.baseline_beta = fit_results{1,2}(8);
-        results.fit_alpha_loss = fit_results{1,3}(1);
-        results.fit_alpha_win = fit_results{1,3}(2);
-        results.fit_rs = fit_results{1,3}(3);
-        results.fit_la = fit_results{1,3}(4);
-        results.fit_pi_loss = fit_results{1,3}(5);
-        results.fit_pi_win = fit_results{1,3}(6);
-        results.fit_zeta = fit_results{1,3}(7);
-        results.fit_beta = fit_results{1,3}(8);
-        results.model_acc = fit_results{1,5};
-        results.avg_action_prob = fit_results{1,6};
+        fieldNames = fieldnames(fit_results.posterior);
+        % Loop over each field name and copy the value to res
+        for i = 1:length(fieldNames)
+            fieldName = fieldNames{i};
+            results.(strcat(fieldName,"_posterior")) = fit_results.posterior.(fieldName);
+            results.(strcat(fieldName,"_prior")) = fit_results.prior.(fieldName);
+        end
+        results.model_acc = fit_results.model_acc;
+        results.avg_action_prob = fit_results.avg_action_prob;
 
         
         save(fullfile([result_dir '/fit_results_' subject '.mat']), 'fit_results');
